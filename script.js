@@ -8,19 +8,29 @@ let offsetY = 0;
 function setupCubes() {
   const containerRect = container.getBoundingClientRect();
 
-  cubes.forEach((cube) => {
+  const positions = Array.from(cubes).map((cube) => {
     const rect = cube.getBoundingClientRect();
 
-    cube.style.left = `${rect.left - containerRect.left}px`;
-    cube.style.top = `${rect.top - containerRect.top}px`;
-    cube.style.position = "absolute";
+    return {
+      cube: cube,
+      left: rect.left - containerRect.left,
+      top: rect.top - containerRect.top
+    };
+  });
 
-    cube.addEventListener("mousedown", startDrag);
+  positions.forEach((position) => {
+    position.cube.style.position = "absolute";
+    position.cube.style.left = `${position.left}px`;
+    position.cube.style.top = `${position.top}px`;
+
+    position.cube.addEventListener("mousedown", startDrag);
   });
 }
 
 function startDrag(event) {
-  activeCube = event.target;
+  event.preventDefault();
+
+  activeCube = event.currentTarget;
 
   const cubeRect = activeCube.getBoundingClientRect();
 
@@ -39,17 +49,17 @@ function dragCube(event) {
 
   const containerRect = container.getBoundingClientRect();
 
-  let x = event.clientX - containerRect.left - offsetX;
-  let y = event.clientY - containerRect.top - offsetY;
+  let newLeft = event.clientX - containerRect.left - offsetX;
+  let newTop = event.clientY - containerRect.top - offsetY;
 
-  const maxX = container.clientWidth - activeCube.offsetWidth;
-  const maxY = container.clientHeight - activeCube.offsetHeight;
+  const maxLeft = container.clientWidth - activeCube.offsetWidth;
+  const maxTop = container.clientHeight - activeCube.offsetHeight;
 
-  x = Math.max(0, Math.min(x, maxX));
-  y = Math.max(0, Math.min(y, maxY));
+  newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+  newTop = Math.max(0, Math.min(newTop, maxTop));
 
-  activeCube.style.left = `${x}px`;
-  activeCube.style.top = `${y}px`;
+  activeCube.style.left = `${newLeft}px`;
+  activeCube.style.top = `${newTop}px`;
 }
 
 function stopDrag() {
@@ -64,4 +74,4 @@ function stopDrag() {
   document.removeEventListener("mouseup", stopDrag);
 }
 
-window.addEventListener("load", setupCubes);
+window.addEventListener("DOMContentLoaded", setupCubes);
